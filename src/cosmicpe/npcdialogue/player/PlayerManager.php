@@ -7,6 +7,7 @@ namespace cosmicpe\npcdialogue\player;
 use pocketmine\event\EventPriority;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\server\DataPacketDecodeEvent;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\NetworkBroadcastUtils;
@@ -55,6 +56,11 @@ final class PlayerManager{
 			}
 		}), 1);
 
+		$manager->registerEvent(DataPacketDecodeEvent::class, function(DataPacketDecodeEvent $event) : void{
+			if($event->getPacketId() === NpcRequestPacket::NETWORK_ID){
+				$event->uncancel();
+			}
+		}, EventPriority::NORMAL, $plugin, true);
 		$manager->registerEvent(DataPacketReceiveEvent::class, function(DataPacketReceiveEvent $event) : void{
 			$packet = $event->getPacket();
 			if(!($packet instanceof NpcRequestPacket)){
